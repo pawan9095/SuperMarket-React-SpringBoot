@@ -4,7 +4,6 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Otp from "./pages/Otp";
-import TestConnection from "./pages/TestConnection";
 import "./App.css";
 
 function App() {
@@ -21,7 +20,6 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/otp" element={<Otp />} />
-        <Route path="/test-connection" element={<TestConnection />} />
         
         {/* Redirect to home if route not found */}
         <Route path="*" element={<Navigate to="/" />} />
