@@ -249,7 +249,7 @@ export default function Navbar() {
       </div>
 
       {/* ================= BOTTOM NAV ================= */}
-      <div
+      {/* <div
         className="flex gap-4 px-4 py-2 font-medium text-sm overflow-x-auto md:px-6 md:gap-6"
         style={{
           backgroundColor: 'var(--nav-bg)',
@@ -280,7 +280,7 @@ export default function Navbar() {
             ></span>
           </span>
         ))}
-      </div>
+      </div> */}
     </header>
   );
 }
