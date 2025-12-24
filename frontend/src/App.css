@@ -89,3 +89,25 @@ main {
   padding-top: 120px; /* Height of navbar */
   flex: 1;
 }
+
+
+/* Ensure footer stays at bottom */
+.min-h-screen {
+  min-height: 100vh;
+}
+
+.mt-auto {
+  margin-top: auto;
+}
+
+/* For pages without footer (auth pages) */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Optional: Add some spacing above footer */
+main {
+  padding-bottom: 2rem; /* Space before footer */
+}
