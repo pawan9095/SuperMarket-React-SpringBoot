@@ -155,16 +155,21 @@ export default function Otp() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col">
       {/* Header */}
       <div className="w-full py-4 px-6 border-b border-gray-200 bg-white">
-        <div 
-          onClick={() => navigate("/")}
-          className="flex items-center gap-2 cursor-pointer w-fit"
-        >
-          <ShoppingBag className="h-8 w-8 text-blue-600" />
-          <span className="text-xl font-bold text-gray-800">
-            Super<span className="text-blue-600">Market</span>
-          </span>
-        </div>
-      </div>
+    <div 
+    onClick={() => navigate("/")}
+    className="flex items-center gap-2 cursor-pointer w-fit hover:opacity-80 transition-opacity"
+  >
+    {/* Your logo image */}
+    <img 
+      src="/trolley.png" 
+      alt="SuperMarket Logo" 
+      className="h-10 w-10" 
+    />
+    <span className="text-xl font-bold text-gray-800">
+      Super<span className="text-blue-600">Market</span>
+    </span>
+  </div>
+</div>
 
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center p-4">
