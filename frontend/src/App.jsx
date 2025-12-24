@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Otp from "./pages/Otp";
+import Profile from "./pages/Profile/Profile";
 import "./App.css";
 
 function App() {
@@ -13,15 +14,15 @@ function App() {
         {/* Routes with Navbar & Footer */}
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
-          {/* Add other pages that need navbar/footer here */}
+          <Route path="profile" element={<Profile />} /> {/* ✅ added */}
         </Route>
-        
-        {/* Routes without Navbar & Footer (Auth pages) */}
+
+        {/* Routes without Navbar & Footer */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/otp" element={<Otp />} />
-        
-        {/* Redirect to home if route not found */}
+
+        {/* Redirect */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
