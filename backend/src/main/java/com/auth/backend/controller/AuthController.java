@@ -36,7 +36,7 @@ public class AuthController {
             user.setVerified(true);
             user.setOtp(0);
             service.save(user);
-            return "VERIFIED";
+            return "VERIFIED success";
         }
         return "INVALID_OTP";
     }
