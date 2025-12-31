@@ -7,16 +7,22 @@ import org.springframework.web.bind.annotation.*;
 import com.auth.backend.entity.User;
 import com.auth.backend.service.UserService;
 
+import java.util.Map;
+
 @RestController
+@RequestMapping("/auth")
 @CrossOrigin(origins = "*")
 public class AuthController {
 
-    @Autowired
-    private UserService service;
+    private final UserService service;
+
+    public AuthController(UserService service) {
+        this.service = service;
+    }
 
     // SIGNUP
     @PostMapping("/signup")
-    public String signup(@RequestBody User user) {
+    public ResponseEntity<?> signup(@RequestBody User user) {
         int otp = (int) (Math.random() * 900000) + 100000;
 
         user.setOtp(otp);
@@ -24,24 +30,32 @@ public class AuthController {
         service.save(user);
         service.sendOtp(user.getEmail(), otp);
 
-        return "OTP_SENT";
+        return ResponseEntity.ok(Map.of(
+                "status", "OTP_SENT"
+        ));
     }
 
     // VERIFY OTP
     @PostMapping("/verify-otp")
-    public String verifyOtp(@RequestBody User req) {
+    public ResponseEntity<?> verifyOtp(@RequestBody User req) {
         User user = service.findByEmail(req.getEmail());
 
         if (user != null && user.getOtp() == req.getOtp()) {
             user.setVerified(true);
             user.setOtp(0);
             service.save(user);
-            return "VERIFIED";
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "VERIFIED"
+            ));
         }
-        return "INVALID_OTP";
+
+        return ResponseEntity.badRequest().body(Map.of(
+                "status", "INVALID_OTP"
+        ));
     }
 
-    // LOGIN ✅
+    // LOGIN
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
 
@@ -59,9 +73,7 @@ public class AuthController {
             return ResponseEntity.status(401).body("WRONG_PASSWORD");
         }
 
-        dbUser.setPassword(null); // security
-        return ResponseEntity.ok(dbUser); // ✅ SUCCESS
+        dbUser.setPassword(null);
+        return ResponseEntity.ok(dbUser);
     }
-
 }
-

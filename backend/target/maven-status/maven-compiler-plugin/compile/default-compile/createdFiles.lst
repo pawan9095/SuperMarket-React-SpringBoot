@@ -1,5 +1,0 @@
-com/auth/backend/entity/User.class
-com/auth/backend/BackendApplication.class
-com/auth/backend/repository/UserRepository.class
-com/auth/backend/service/UserService.class
-com/auth/backend/controller/AuthController.class
