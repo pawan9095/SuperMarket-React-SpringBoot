@@ -86,12 +86,12 @@ export default function Overview({ user }) {
             <h2 className="text-xl font-bold text-gray-900">Personal Information</h2>
             <p className="text-gray-600 mt-1">Manage your personal details and preferences</p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2.5 text-blue-600 hover:text-blue-700 font-medium border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors whitespace-nowrap">
+          {/* <button className="flex items-center gap-2 px-4 py-2.5 text-blue-600 hover:text-blue-700 font-medium border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors whitespace-nowrap">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
             Edit Information
-          </button>
+          </button> */}
         </div>
 
         {/* Information Grid */}

@@ -1,89 +1,122 @@
-import { Camera, Edit2, LogOut, Shield, TrendingUp, Mail, Phone, Calendar } from "lucide-react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Camera, Edit2, LogOut, Mail, Shield, Calendar } from "lucide-react";
 
 export default function ProfileHeader({ user }) {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    navigate("/login");
-  };
+  const [preview, setPreview] = useState(
+    user?.profileImage
+      ? `http://localhost:8080/uploads/profile-images/${user.profileImage}`
+      : null
+  );
 
   return (
-    <div className="relative mb-8 overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-10 rounded-2xl"></div>
-      
-      <div className="relative bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        {/* Header background with sharp top corners */}
-        <div className="h-32 bg-gradient-to-r from-blue-500 to-purple-600 rounded-t-2xl"></div>
-        
-        <div className="relative px-6 md:px-8 pb-6">
-          {/* Profile info */}
-          <div className="flex flex-col md:flex-row items-start md:items-end -mt-16 md:-mt-20">
+    <div className="relative mb-8">
+      {/* Header Card */}
+      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+
+        {/* Gradient Header */}
+        <div className="h-28 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600"></div>
+
+        {/* Content */}
+        <div className="px-6 pb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-6 -mt-14">
+
             {/* Avatar */}
-            <div className="relative group">
-              <div className="w-32 h-32 rounded-full border-4 border-white bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center shadow-lg">
-                <span className="text-4xl font-bold text-white">
-                  {user.name?.charAt(0) || user.email.charAt(0)}
-                </span>
+            <div className="relative">
+              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 border-4 border-white overflow-hidden flex items-center justify-center text-white text-2xl font-bold">
+                {preview ? (
+                  <img
+                    src={preview}
+                    className="w-full h-full object-cover"
+                    alt="Profile"
+                  />
+                ) : (
+                  user.name?.charAt(0) || "U"
+                )}
               </div>
-              <button className="absolute bottom-2 right-2 p-2 bg-white rounded-full shadow-lg hover:shadow-xl transition-shadow group-hover:scale-110 border border-gray-200">
-                <Camera className="w-4 h-4 text-gray-700" />
+
+              <input
+                type="file"
+                id="profileImage"
+                hidden
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) setPreview(URL.createObjectURL(file));
+                }}
+              />
+
+              <button
+                type="button"
+                onClick={() => document.getElementById("profileImage").click()}
+                className="absolute bottom-0 right-0 bg-white p-1.5 rounded-full border shadow"
+              >
+                <Camera className="w-4 h-4 text-gray-600" />
               </button>
             </div>
 
-            {/* User details */}
-            <div className="mt-4 md:mt-0 md:ml-6 md:mb-4 flex-1">
-              <div className="flex flex-col md:flex-row md:items-center justify-between">
-                <div>
-                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{user.name}</h1>
-                  <div className="flex flex-wrap items-center gap-3 mt-2">
-                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm border border-blue-200">
-                      <Mail className="w-3 h-3" /> {user.email}
-                    </span>
-                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm border border-green-200">
-                      <Shield className="w-3 h-3" /> Verified Account
-                    </span>
-                  </div>
+            {/* Info + Actions */}
+            <div className="flex-1 flex flex-col gap-4">
+
+              {/* Email + Verified + Actions */}
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="flex items-center gap-2 px-4 py-1.5 bg-white rounded-full shadow text-blue-600 font-medium text-sm">
+                    <Mail className="w-4 h-4" />
+                    {user.email}
+                  </span>
+
+                  <span className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
+                    <Shield className="w-4 h-4" /> Verified
+                  </span>
                 </div>
 
-                {/* Action buttons - Logout button with white background */}
-                <div className="flex gap-3 mt-4 md:mt-0">
-                  <button className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 border border-blue-600">
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => navigate("/profile/edit")}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg"
+                  >
                     <Edit2 className="w-4 h-4" /> Edit Profile
                   </button>
+
                   <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-white text-gray-700 rounded-lg border border-gray-300 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 hover:border-red-300 hover:bg-red-50 hover:text-red-600"
+                    type="button"
+                    onClick={() => {
+                      localStorage.removeItem("user");
+                      navigate("/login");
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-white border rounded-lg"
                   >
                     <LogOut className="w-4 h-4" /> Logout
                   </button>
                 </div>
               </div>
 
-              {/* Stats - Fixed border edges */}
-              <div className="grid grid-cols-3 gap-4 mt-6">
-                {/* Joined */}
-                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                  <div className="text-sm text-gray-500 mb-1 flex items-center gap-2">
+              {/* Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 border rounded-xl">
+                  <div className="text-sm text-gray-500 flex items-center gap-2">
                     <Calendar className="w-4 h-4" /> Joined
                   </div>
-                  <div className="font-semibold text-gray-900 text-lg">4 Jan 2024</div>
+                  <div className="font-semibold text-gray-900">
+                    4 Jan 2024
+                  </div>
                 </div>
-                
-                {/* Orders */}
-                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                  <div className="text-sm text-gray-500 mb-1">Orders</div>
-                  <div className="font-semibold text-gray-900 text-lg">12 Completed</div>
+
+                <div className="p-4 border rounded-xl">
+                  <div className="text-sm text-gray-500">Orders</div>
+                  <div className="font-semibold text-gray-900">12 Completed</div>
                 </div>
-                
-                {/* Reviews */}
-                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                  <div className="text-sm text-gray-500 mb-1">Reviews</div>
-                  <div className="font-semibold text-gray-900 text-lg">8 Written</div>
+
+                <div className="p-4 border rounded-xl">
+                  <div className="text-sm text-gray-500">Reviews</div>
+                  <div className="font-semibold text-gray-900">8 Written</div>
                 </div>
               </div>
+
             </div>
           </div>
         </div>
