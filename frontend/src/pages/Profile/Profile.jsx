@@ -4,7 +4,7 @@ import Navbar from "../../components/Navbar";
 import ProfileHeader from "./ProfileHeader";
 import ProfileSidebar from "./ProfileSidebar";
 
-// Import all tab components
+// Tabs
 import Overview from "./tabs/Overview";
 import Orders from "./tabs/Orders";
 import Address from "./tabs/Address";
@@ -22,15 +22,28 @@ export default function Profile() {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (!storedUser) {
+
+    if (!storedUser?.email) {
       navigate("/login");
       return;
     }
-    // Simulate API loading
-    setTimeout(() => {
-      setUser(storedUser);
-      setIsLoading(false);
-    }, 500);
+
+    // 🔥 ALWAYS FETCH LATEST USER FROM DB
+    fetch(`http://localhost:8080/api/users/me?email=${storedUser.email}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch user");
+        return res.json();
+      })
+      .then((dbUser) => {
+        localStorage.setItem("user", JSON.stringify(dbUser));
+        setUser(dbUser);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        localStorage.removeItem("user");
+        navigate("/login");
+      });
   }, [navigate]);
 
   if (isLoading) {
@@ -78,7 +91,6 @@ export default function Profile() {
           <ProfileHeader user={user} />
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Sidebar */}
             <div className="lg:col-span-1">
               <ProfileSidebar
                 activeTab={activeTab}
@@ -86,11 +98,8 @@ export default function Profile() {
               />
             </div>
 
-            {/* Main Content */}
             <div className="lg:col-span-3">
-              <div className="animate-fadeIn">
-                {renderTab()}
-              </div>
+              <div className="animate-fadeIn">{renderTab()}</div>
             </div>
           </div>
         </div>

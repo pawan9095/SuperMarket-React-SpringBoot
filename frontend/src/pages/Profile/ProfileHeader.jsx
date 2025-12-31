@@ -11,9 +11,38 @@ export default function ProfileHeader({ user }) {
       : null
   );
 
+  // 🔥 FIX: upload image to backend
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // instant preview
+    setPreview(URL.createObjectURL(file));
+
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("email", user.email);
+
+    try {
+      const res = await fetch(
+        "http://localhost:8080/api/users/profile-image",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const updatedUser = await res.json();
+
+      // update localStorage so image persists
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    } catch (err) {
+      console.error("Image upload failed", err);
+    }
+  };
+
   return (
     <div className="relative mb-8">
-      {/* Header Card */}
       <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
 
         {/* Gradient Header */}
@@ -37,20 +66,20 @@ export default function ProfileHeader({ user }) {
                 )}
               </div>
 
+              {/* 🔥 FIXED INPUT */}
               <input
                 type="file"
                 id="profileImage"
                 hidden
                 accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) setPreview(URL.createObjectURL(file));
-                }}
+                onChange={handleImageChange}
               />
 
               <button
                 type="button"
-                onClick={() => document.getElementById("profileImage").click()}
+                onClick={() =>
+                  document.getElementById("profileImage").click()
+                }
                 className="absolute bottom-0 right-0 bg-white p-1.5 rounded-full border shadow"
               >
                 <Camera className="w-4 h-4 text-gray-600" />
