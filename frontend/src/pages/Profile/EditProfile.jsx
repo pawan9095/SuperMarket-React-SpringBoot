@@ -19,21 +19,41 @@ export default function EditProfile() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const res = await fetch("http://localhost:8080/api/users/profile", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${storedUser.token}`,
-      },
-      body: JSON.stringify(form),
-    });
+  try {
+    const res = await fetch(
+      `http://localhost:8080/api/users/profile?email=${storedUser.email}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: form.name,
+          phone: form.phone,
+          dob: form.dob,
+          gender: form.gender,
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to update profile");
+    }
 
     const updatedUser = await res.json();
+
+    // ✅ Save updated user
     localStorage.setItem("user", JSON.stringify(updatedUser));
+
+    // ✅ Redirect to profile page
     navigate("/profile");
-  };
+  } catch (err) {
+    console.error(err);
+    alert("Profile update failed");
+  }
+};
 
   return (
     <>
