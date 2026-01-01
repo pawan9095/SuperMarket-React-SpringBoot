@@ -3,7 +3,6 @@ import { useState, useRef, useEffect } from "react";
 import {
   Search,
   ShoppingCart,
-  ChevronDown,
   User,
   LogOut,
   Sun,
@@ -13,30 +12,20 @@ import {
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
+
+  // ✅ SAFE localStorage read (prevents crash)
+  const user = (() => {
+    try {
+      return JSON.parse(localStorage.getItem("user"));
+    } catch {
+      return null;
+    }
+  })();
+
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [theme, setTheme] = useState(
-    localStorage.getItem("theme") || "light"
-  );
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const dropdownRef = useRef(null);
-
-  /* ===== THEME HANDLING ===== */
-  useEffect(() => {
-    const currentTheme = themes[theme];
-    
-    // Apply theme to document root
-    document.documentElement.style.setProperty('--nav-bg', currentTheme.navBg);
-    document.documentElement.style.setProperty('--nav-border', currentTheme.navBorder);
-    document.documentElement.style.setProperty('--text', currentTheme.text);
-    document.documentElement.style.setProperty('--accent', currentTheme.accent);
-    document.documentElement.style.setProperty('--accent-hover', currentTheme.accentHover);
-    document.documentElement.style.setProperty('--dropdown-bg', currentTheme.dropdownBg);
-    
-    // Set data-theme attribute
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
 
   /* ===== THEME DEFINITIONS ===== */
   const themes = {
@@ -66,7 +55,22 @@ export default function Navbar() {
     }
   };
 
-  /* ===== CLOSE DROPDOWN ===== */
+  /* ===== APPLY THEME ===== */
+  useEffect(() => {
+    const currentTheme = themes[theme];
+
+    document.documentElement.style.setProperty("--nav-bg", currentTheme.navBg);
+    document.documentElement.style.setProperty("--nav-border", currentTheme.navBorder);
+    document.documentElement.style.setProperty("--text", currentTheme.text);
+    document.documentElement.style.setProperty("--accent", currentTheme.accent);
+    document.documentElement.style.setProperty("--accent-hover", currentTheme.accentHover);
+    document.documentElement.style.setProperty("--dropdown-bg", currentTheme.dropdownBg);
+
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  /* ===== CLOSE DROPDOWN ON OUTSIDE CLICK ===== */
   useEffect(() => {
     const handler = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -80,39 +84,35 @@ export default function Navbar() {
   const logout = () => {
     localStorage.removeItem("user");
     setOpen(false);
-    navigate("/");
+    navigate("/login");
   };
 
   const getThemeIcon = () => {
-    switch(theme) {
-      case "dark": return <Moon size={20} />;
-      case "brand": return <Sparkles size={20} />;
-      default: return <Sun size={20} />;
-    }
+    if (theme === "dark") return <Moon size={20} />;
+    if (theme === "brand") return <Sparkles size={20} />;
+    return <Sun size={20} />;
   };
 
   const getNextTheme = () => {
-    const themeOrder = ["light", "dark", "brand"];
-    const currentIndex = themeOrder.indexOf(theme);
-    return themeOrder[(currentIndex + 1) % themeOrder.length];
+    const order = ["light", "dark", "brand"];
+    return order[(order.indexOf(theme) + 1) % order.length];
   };
 
   return (
     <header>
-      {/* ================= TOP NAV ================= */}
       <div
         className="flex items-center justify-between px-4 py-3 border-b md:px-6"
         style={{
-          backgroundColor: 'var(--nav-bg)',
-          color: 'var(--text)',
-          borderColor: 'var(--nav-border)',
-          height: '64px'
+          backgroundColor: "var(--nav-bg)",
+          color: "var(--text)",
+          borderColor: "var(--nav-border)",
+          height: "64px"
         }}
       >
-        {/* Logo */}
+        {/* LOGO */}
         <div
           onClick={() => navigate("/")}
-          className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2 cursor-pointer hover:opacity-80"
         >
           <img src="/trolley.png" alt="SuperMarket" className="h-8 w-8" />
           <span className="text-xl font-bold">
@@ -120,7 +120,7 @@ export default function Navbar() {
           </span>
         </div>
 
-        {/* Search (hidden on mobile) */}
+        {/* SEARCH */}
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -130,73 +130,57 @@ export default function Navbar() {
           }}
           className="hidden md:flex flex-1 max-w-md mx-4"
         >
-          <div 
-            className="flex w-full rounded-full overflow-hidden border transition-all"
-            style={{
-              borderColor: 'var(--nav-border)',
-              backgroundColor: theme === 'dark' ? '#374151' : '#ffffff'
-            }}
-          >
+          <div className="flex w-full rounded-full overflow-hidden border">
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search products..."
               className="flex-1 px-4 py-2 text-sm outline-none"
-              style={{
-                color: theme === 'dark' ? '#f9fafb' : '#1f2937',
-                backgroundColor: 'transparent'
-              }}
             />
             <button
               type="submit"
-              className="px-4 transition-colors hover:opacity-90"
-              style={{ 
-                backgroundColor: "var(--accent)",
-                color: theme === 'brand' ? '#1f2937' : '#ffffff'
-              }}
+              className="px-4"
+              style={{ backgroundColor: "var(--accent)", color: "#fff" }}
             >
               <Search size={18} />
             </button>
           </div>
         </form>
 
-        {/* Right side icons */}
+        {/* RIGHT SIDE */}
         <div className="flex items-center gap-3">
-          {/* Theme Switch */}
+          {/* THEME */}
           <button
             onClick={() => setTheme(getNextTheme())}
-            className="p-2 rounded-full hover:opacity-80 transition-all"
-            style={{ 
-              backgroundColor: "var(--accent)",
-              color: theme === 'brand' ? '#1f2937' : '#ffffff'
-            }}
-            title={`Change to ${getNextTheme()} theme`}
+            className="p-2 rounded-full"
+            style={{ backgroundColor: "var(--accent)", color: "#fff" }}
           >
             {getThemeIcon()}
           </button>
 
-          {/* Account */}
+          {/* USER */}
           {user ? (
             <div className="relative" ref={dropdownRef}>
               <div
                 onClick={() => setOpen(!open)}
-                className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity p-2 rounded-lg"
-                style={{ backgroundColor: 'rgba(var(--accent-rgb), 0.1)' }}
+                className="flex items-center gap-2 cursor-pointer p-2 rounded-lg"
               >
-                <div className="w-8 h-8 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: "var(--accent)", color: "#ffffff" }}
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center font-bold"
+                  style={{ backgroundColor: "var(--accent)", color: "#fff" }}
                 >
-                  {user.email.charAt(0).toUpperCase()}
+                  {(user?.name?.charAt(0) ||
+                    user?.email?.charAt(0) ||
+                    "U").toUpperCase()}
                 </div>
               </div>
 
               {open && (
-                <div 
+                <div
                   className="absolute right-0 mt-2 w-48 rounded-lg shadow-xl border overflow-hidden"
                   style={{
-                    backgroundColor: 'var(--dropdown-bg)',
-                    color: 'var(--text)',
-                    borderColor: 'var(--nav-border)'
+                    backgroundColor: "var(--dropdown-bg)",
+                    borderColor: "var(--nav-border)"
                   }}
                 >
                   <button
@@ -204,19 +188,16 @@ export default function Navbar() {
                       navigate("/profile");
                       setOpen(false);
                     }}
-                    className="w-full px-4 py-3 hover:opacity-80 flex items-center gap-3 transition-colors border-b text-sm"
-                    style={{ borderColor: 'var(--nav-border)' }}
+                    className="w-full px-4 py-3 flex items-center gap-3 text-sm"
                   >
-                    <User size={16} /> 
-                    <span>My Profile</span>
+                    <User size={16} /> My Profile
                   </button>
+
                   <button
                     onClick={logout}
-                    className="w-full px-4 py-3 hover:opacity-80 flex items-center gap-3 transition-colors text-sm"
-                    style={{ color: '#ef4444' }}
+                    className="w-full px-4 py-3 flex items-center gap-3 text-sm text-red-500"
                   >
-                    <LogOut size={16} /> 
-                    <span>Logout</span>
+                    <LogOut size={16} /> Logout
                   </button>
                 </div>
               )}
@@ -224,21 +205,17 @@ export default function Navbar() {
           ) : (
             <button
               onClick={() => navigate("/login")}
-              className="font-semibold px-4 py-2 rounded-lg transition-colors hover:opacity-80 text-sm"
-              style={{ 
-                backgroundColor: "var(--accent)",
-                color: theme === 'brand' ? '#1f2937' : '#ffffff'
-              }}
+              className="px-4 py-2 rounded-lg text-sm font-semibold"
+              style={{ backgroundColor: "var(--accent)", color: "#fff" }}
             >
               Login / Sign Up
             </button>
           )}
 
-          {/* Cart */}
+          {/* CART */}
           <div
             onClick={() => navigate("/cart")}
-            className="flex items-center gap-2 cursor-pointer font-semibold p-2 rounded-lg hover:opacity-80 transition-opacity text-sm"
-            style={{ backgroundColor: 'rgba(var(--accent-rgb), 0.1)' }}
+            className="flex items-center gap-2 cursor-pointer p-2 rounded-lg"
           >
             <ShoppingCart size={20} />
             <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -247,40 +224,6 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-
-      {/* ================= BOTTOM NAV ================= */}
-      {/* <div
-        className="flex gap-4 px-4 py-2 font-medium text-sm overflow-x-auto md:px-6 md:gap-6"
-        style={{
-          backgroundColor: 'var(--nav-bg)',
-          color: 'var(--text)',
-          borderBottom: `1px solid var(--nav-border)`,
-          height: '56px',
-          alignItems: 'center'
-        }}
-      >
-        {[
-          "All",
-          "Fresh",
-          "Best Sellers",
-          "Mobiles",
-          "Deals",
-          "Electronics",
-          "Home & Kitchen"
-        ].map((item) => (
-          <span
-            key={item}
-            onClick={() => navigate(`/category/${item.toLowerCase().replace(' & ', '-').replace(' ', '-')}`)}
-            className="cursor-pointer transition-all duration-200 hover:scale-105 relative group whitespace-nowrap"
-          >
-            {item}
-            <span 
-              className="absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300"
-              style={{ backgroundColor: "var(--accent)" }}
-            ></span>
-          </span>
-        ))}
-      </div> */}
     </header>
   );
 }
