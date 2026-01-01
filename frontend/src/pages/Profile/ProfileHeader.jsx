@@ -5,11 +5,8 @@ import { Camera, Edit2, LogOut, Mail, Shield, Calendar } from "lucide-react";
 export default function ProfileHeader({ user }) {
   const navigate = useNavigate();
 
-  const [preview, setPreview] = useState(
-    user?.profileImage
-      ? `http://localhost:8080/uploads/profile-images/${user.profileImage}`
-      : null
-  );
+const [preview, setPreview] = useState(user?.profileImage || null);
+
 
   // 🔥 FIX: upload image to backend
   const handleImageChange = async (e) => {

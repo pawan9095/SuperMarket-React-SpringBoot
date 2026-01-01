@@ -62,18 +62,25 @@ public class AuthController {
         User dbUser = service.findByEmail(user.getEmail());
 
         if (dbUser == null) {
-            return ResponseEntity.status(401).body("USER_NOT_FOUND");
+            return ResponseEntity.status(401).body(
+                    Map.of("error", "USER_NOT_FOUND")
+            );
         }
 
         if (!dbUser.isVerified()) {
-            return ResponseEntity.status(401).body("NOT_VERIFIED");
+            return ResponseEntity.status(401).body(
+                    Map.of("error", "NOT_VERIFIED")
+            );
         }
 
         if (!dbUser.getPassword().equals(user.getPassword())) {
-            return ResponseEntity.status(401).body("WRONG_PASSWORD");
+            return ResponseEntity.status(401).body(
+                    Map.of("error", "WRONG_PASSWORD")
+            );
         }
 
         dbUser.setPassword(null);
         return ResponseEntity.ok(dbUser);
     }
+
 }

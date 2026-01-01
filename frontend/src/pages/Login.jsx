@@ -35,37 +35,36 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8080/login", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
-        body: JSON.stringify(formData),
-      });
+      const res = await fetch("http://localhost:8080/auth/login", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Accept": "application/json"
+  },
+  body: JSON.stringify(formData),
+});
 
-      const data = await res.json();
-      
-      if (res.ok) {
-        // Login successful
-        localStorage.setItem("user", JSON.stringify(data));
-        navigate("/"); // Redirect to home page
-      } else {
-        // Handle different error cases
-        switch(data) {
-          case "USER_NOT_FOUND":
-            setError("No account found with this email");
-            break;
-          case "NOT_VERIFIED":
-            setError("Please verify your email first");
-            break;
-          case "WRONG_PASSWORD":
-            setError("Incorrect password");
-            break;
-          default:
-            setError("Login failed. Please try again.");
-        }
-      }
+const data = await res.json();
+
+if (res.ok) {
+  localStorage.setItem("user", JSON.stringify(data));
+  navigate("/");
+} else {
+  switch (data.error) {
+    case "USER_NOT_FOUND":
+      setError("No account found with this email");
+      break;
+    case "NOT_VERIFIED":
+      setError("Please verify your email first");
+      break;
+    case "WRONG_PASSWORD":
+      setError("Incorrect password");
+      break;
+    default:
+      setError("Login failed. Please try again.");
+  }
+}
+
     } catch (err) {
       console.error("Login error:", err);
       setError("Server error. Please check your connection.");
